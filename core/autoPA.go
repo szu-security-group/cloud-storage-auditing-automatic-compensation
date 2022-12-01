@@ -9,13 +9,15 @@ import (
 	"sync"
 )
 
+// KeySuite Define the structure of the public key and secret key required by the protocol
 type KeySuite struct {
-	D *big.Int
+	D *big.Int // D is a secret key
 	G int64
-	N *big.Int
+	N *big.Int // N and E are public keys
 	E int
 }
 
+// follow above.
 type sk struct {
 	D *big.Int
 	G *big.Int
@@ -26,16 +28,19 @@ type Pk struct {
 	N *big.Int
 }
 
+// ATag is aggregations base Tag (BAT)
 type ATag struct {
-	Index []int
-	Tag   *big.Int
+	Index []int    // block indexes included in a window
+	Tag   *big.Int // value
 }
 
+// Ch is Challenge information
 type Ch struct {
 	Index         []int
 	ChallengeTags []*big.Int
 }
 
+// ACh is aggregations challenge Tag
 type ACh struct {
 	Index  [][]int
 	ChalTs []*big.Int
@@ -43,14 +48,16 @@ type ACh struct {
 
 var wg sync.WaitGroup
 
+// KeySetup generate keys and public keys according to the securityLevel
 func KeySetup(securityLevel int) (Sk sk, pk Pk) {
 	keyPair, err := rsa.GenerateKey(rand.Reader, securityLevel)
-	nBig, err := rand.Int(rand.Reader, big.NewInt(27))
+
+	g, err := rand.Int(rand.Reader, keyPair.N)
 	check(err)
 
 	Sk = sk{
 		D: keyPair.D,
-		G: nBig,
+		G: g,
 	}
 	pk = Pk{
 		N: keyPair.N,
@@ -59,6 +66,8 @@ func KeySetup(securityLevel int) (Sk sk, pk Pk) {
 	return
 }
 
+// TagGenerate generates HVT for each data block called by client
+// Open goCount goroutines for concurrent computing
 func TagGenerate(fileSet *[]data.Block, sk2 sk, pk2 Pk, goCount int) {
 	d := sk2.D
 	g := sk2.G
@@ -68,7 +77,6 @@ func TagGenerate(fileSet *[]data.Block, sk2 sk, pk2 Pk, goCount int) {
 
 	wg = sync.WaitGroup{}
 	for i := 0; i < goCount; i++ {
-
 		s := i * (length / goCount)
 		end := (i + 1) * (length / goCount)
 		wg.Add(1)
@@ -80,15 +88,15 @@ func TagGenerate(fileSet *[]data.Block, sk2 sk, pk2 Pk, goCount int) {
 				temp := new(big.Int).Exp(g, m, N)
 				// g^m^d mod N
 				temp.Exp(temp, d, N)
-				//c <- temp
+				// c <- temp
 				(*fileSet)[j].Tag = temp
 			}
-
 		}(s, end)
 	}
 	wg.Wait()
 }
 
+// AggregateTag aggregates HVTs into windows
 func AggregateTag(fileSet *[]data.Block, pk2 Pk, w, c int) *[]ATag {
 	l := len(*fileSet)
 	ts := make([]ATag, 0)
@@ -97,7 +105,7 @@ func AggregateTag(fileSet *[]data.Block, pk2 Pk, w, c int) *[]ATag {
 		if i%c == 0 && i != l-1 {
 			t := new(big.Int).Add((*fileSet)[i].Tag, big.NewInt(0)) // 这里是浅拷贝而不是深拷贝，主要复制值
 			l1 := make([]int, 0)                                    // 存储聚合标签的索引
-			l1 = append(l1, i)                                      // 存储当前第一个
+			l1 = append(l1, i)
 
 			if i+w > l { // 最后聚集标签不满的情况，取剩余标签聚合
 				for b := i + 1; b <= l-1; b++ {
@@ -119,7 +127,8 @@ func AggregateTag(fileSet *[]data.Block, pk2 Pk, w, c int) *[]ATag {
 	return &ts
 }
 
-func GsSet(N *big.Int, g *big.Int) (s *big.Int, gs *big.Int) {
+// GetGs generates a random number s for each challenge
+func GetGs(N *big.Int, g *big.Int) (s *big.Int, gs *big.Int) {
 	s, _ = rand.Int(rand.Reader, big.NewInt(1000000))
 
 	// g^s mod N
@@ -128,7 +137,8 @@ func GsSet(N *big.Int, g *big.Int) (s *big.Int, gs *big.Int) {
 
 }
 
-func ChalSet(fileSet *[]data.Block, rSize int, s *big.Int, N *big.Int) Ch {
+// SetChallengeWithHVT use HVT as base tag, not BAT
+func SetChallengeWithHVT(fileSet *[]data.Block, rSize int, s *big.Int, N *big.Int) Ch {
 	length := len(*fileSet)
 	if rSize > length {
 		rSize = length
@@ -154,7 +164,8 @@ func ChalSet(fileSet *[]data.Block, rSize int, s *big.Int, N *big.Int) Ch {
 
 }
 
-func ChalASet(tags *[]ATag, rSize int, s *big.Int, N *big.Int) ACh {
+// SetChallengeTagWithAggregation use BAT as base tag, boosting effective of protocol
+func SetChallengeTagWithAggregation(tags *[]ATag, rSize int, s *big.Int, N *big.Int) ACh {
 	length := len(*tags)
 	w := len((*tags)[0].Index)
 	allBlock := length * w
@@ -165,7 +176,7 @@ func ChalASet(tags *[]ATag, rSize int, s *big.Int, N *big.Int) ACh {
 	rSize = rSize/w + 1
 
 	randIndex := make([][]int, rSize)
-	chals := make([]*big.Int, 0)
+	chalS := make([]*big.Int, 0)
 
 	for i := 0; i < rSize; i++ {
 		ri, _ := rand.Int(rand.Reader, big.NewInt(int64(length)))
@@ -173,17 +184,18 @@ func ChalASet(tags *[]ATag, rSize int, s *big.Int, N *big.Int) ACh {
 
 		randIndex[i] = (*tags)[j].Index
 		chalT := new(big.Int).Exp((*tags)[j].Tag, s, N)
-		chals = append(chals, chalT)
+		chalS = append(chalS, chalT)
 
 	}
 
 	c := ACh{
 		Index:  randIndex,
-		ChalTs: chals,
+		ChalTs: chalS,
 	}
 	return c
 }
 
+// ProofGen return a proof for challenge (HVT)
 func ProofGen(fileSet *[]data.Block, ranIndex []int, gs *big.Int, N *big.Int) []*big.Int {
 	proof := make([]*big.Int, 0)
 	for _, index := range ranIndex {
@@ -196,7 +208,8 @@ func ProofGen(fileSet *[]data.Block, ranIndex []int, gs *big.Int, N *big.Int) []
 	return proof
 }
 
-func ProofGenA(fileSet []data.Block, ranIndex [][]int, gs *big.Int, N *big.Int) []*big.Int {
+// ProofGenWithAggregation return a proof for challenge (BAT)
+func ProofGenWithAggregation(fileSet []data.Block, ranIndex [][]int, gs *big.Int, N *big.Int) []*big.Int {
 	proof := make([]*big.Int, 0)
 
 	for _, indexs := range ranIndex {
@@ -232,7 +245,7 @@ func Verify(challSet Ch, proof []*big.Int, E *big.Int, N *big.Int) (wrongFlag []
 
 }
 
-func VerifyA(chs ACh, proof []*big.Int, E *big.Int, N *big.Int) (wFlag [][]int) {
+func VerifyWithAggregation(chs ACh, proof []*big.Int, E *big.Int, N *big.Int) (wFlag [][]int) {
 	var Proof *big.Int
 	var right *big.Int
 

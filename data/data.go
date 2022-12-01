@@ -5,11 +5,32 @@ import (
 	"math/big"
 	"math/rand"
 	"os"
+	"strconv"
+	"strings"
 )
 
 type Block struct {
 	Content []byte   // 4096 bytes
 	Tag     *big.Int // 128 bytes
+}
+
+func GetDataAsSize(size string) []byte {
+	size = strings.ToLower(size)
+	ans := 1
+	if strings.Contains(size, "mb") {
+		ans = 1024
+	} else if strings.Contains(size, "gb") {
+		ans = 1024 * 1024
+	}
+
+	num, _ := strconv.Atoi(size[:len(size)-2])
+
+	_, err := os.Stat(size)
+	if err != nil && os.IsNotExist(err) {
+		GenDataAs1Kb(num*ans, size)
+	}
+	d, err := os.ReadFile("data/" + size)
+	return d
 }
 
 func GenDataAs1Kb(size int, name string) {
