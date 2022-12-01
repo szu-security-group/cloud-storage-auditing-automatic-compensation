@@ -2,7 +2,6 @@
 
 With the large-scale application of cloud storage services, the security of stored data is valued by individuals and companies.
 To enhance outsourced data security, cloud storage auditing protocols to verify the integrity of the data without downloading all the data.
-To alleviate the need of a trusted third party in public auditing, recent work proposed using blockchain to support public cloud storage auditing.
 
 ## What we do
 ![model.png](model.png)
