@@ -48,5 +48,5 @@ Because of the differences in contract deployment, some difficult problems may a
 
 We still provide two methods for you to test the contract, the first one is `remix online compiler`. You can push files in `contract` to `remix` and deploy it and call the function easy. The operational details of the protocol can be clearly displayed, such as gas cost.
 
-The second method is slightly more complicated. You can use `api` way to make your go program connect to blockchain and run the function. `Rinkeby` is a public test blockchain and `Ganache` is a private personal test blockchain platform. You can create a wallet through MetaMask, and then deploy smart contracts on blockchain and test the operation of the protocol and its performance.
+The second method is slightly more complicated. You can use `api` way to make your go program connect to blockchain and run the function. `Rinkeby` is a public test blockchain and `Ganache` is a private personal test blockchain platform. You can create a wallet through `MetaMask`, and then deploy smart contracts on blockchain and test the operation of the protocol and its performance.
 
