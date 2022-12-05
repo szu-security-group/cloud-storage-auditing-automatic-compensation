@@ -10,6 +10,7 @@ var SecurityLevel = 1024
 var DataSize = "16MB"
 var GoNumber = 16
 var ChallengeNumber = 460
+var windowSize = 20
 
 func main() {
 	timeCollect := core.TimeController{}
@@ -43,7 +44,7 @@ func main() {
 
 	} else {
 		timeCollect.Start("AggregateTag")
-		aggTs := core.AggregateTag(&fileSet, pk, 20, 20)
+		aggTs := core.AggregateTag(&fileSet, pk, windowSize, windowSize)
 		timeCollect.End()
 
 		timeCollect.Start("Challenge")
