@@ -21,7 +21,7 @@ go run .
 
 ```
 
-### project layout
+### Project layout
 Let's briefly introduce the layout of the project. 
 ```text
 contracts
@@ -43,7 +43,7 @@ The `main.go` is a complete demo of the protocol.
 
 `data` are simple data processing methods collection.
 
-### deploy contract
+### Deploy contract
 Because of the differences in contract deployment, some difficult problems may arise. We only provide the source code of the contract, and the guidance for deploying the contract is beyond the scope of this discussion.
 
 We still provide two methods for you to test the contract, the first one is `remix online compiler`. You can push files in `contract` to `remix` and deploy it and call the function easy. The operational details of the protocol can be clearly displayed, such as gas cost.
