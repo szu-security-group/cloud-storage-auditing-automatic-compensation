@@ -11,7 +11,7 @@ The protocol only requires one signature verification that is natively supported
 The proposed protocol also supports automatic user compensation.
 
 ## Usage
-### Install
+### Installation
 Our project code is written in golang, make sure you have version 1.19 of golang on your computer. You can download the code by git clone. Run the command line as shown below.
 
 ```text
@@ -36,8 +36,11 @@ main.go
 ```
 
 The `main.go` is a complete demo of the protocol.
+
 `contract` contains the solidity files of the smart contract. 
+
 `core\autoPA.go` includes each algorithm of the protocol. 
+
 `data` are simple data processing methods collection.
 
 ### deploy contract
