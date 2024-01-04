@@ -1,7 +1,7 @@
 # Blockchain assisted low-onchain-cost cloud storage auditing
 
 With the large-scale application of cloud storage services, the security of stored data is valued by individuals and companies.
-To enhance outsourced data security, cloud storage auditing that can verify the integrity of the data without downloading all the data attracts research efforts.
+To enhance outsourced data security, cloud storage auditing is able to verify the integrity of the data without downloading all the data attracts research efforts.
 On the meanwhile, blockchain is also emerging due to its intrinsic trustfulness and the useful smart contract feature.
 This work leverages blockchain to enable better cloud storage auditing that supports efficient user compensation, which in the long guarantees both user and cloud interests.
 
