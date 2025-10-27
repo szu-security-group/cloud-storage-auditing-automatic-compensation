@@ -23,15 +23,17 @@ type TimeController struct {
 }
 
 func (t *TimeController) Start(phase string) {
+
 	if t.timeQueue == nil {
 		t.timeQueue = []string{}
 	}
 	t.phase = phase
 	t.startTime = time.Now().UnixMicro()
 }
+
 func (t *TimeController) End() {
 	t.endTime = time.Now().UnixMicro()
-	t.timeQueue = append(t.timeQueue, fmt.Sprintf("%v:%v ms", t.phase, t.endTime-t.startTime))
+	t.timeQueue = append(t.timeQueue, fmt.Sprintf("%v:%v µs", t.phase, t.endTime-t.startTime))
 }
 
 func (t *TimeController) Output() {
