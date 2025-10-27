@@ -20,8 +20,8 @@ import (
 )
 
 type Block struct {
-	Content []byte   // 4096 bytes
-	Tag     *big.Int // 128 bytes
+	Content []byte
+	Tag     *big.Int
 }
 
 func GetDataAsSize(size string) []byte {
@@ -35,7 +35,7 @@ func GetDataAsSize(size string) []byte {
 
 	num, _ := strconv.Atoi(size[:len(size)-2])
 
-	_, err := os.Stat(size)
+	_, err := os.Stat("data/" + size)
 	if err != nil && os.IsNotExist(err) {
 		GenDataAs1Kb(num*ans, size)
 	}
