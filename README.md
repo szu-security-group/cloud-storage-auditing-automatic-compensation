@@ -11,7 +11,7 @@ This work leverages blockchain to enable better cloud storage auditing that supp
 To solve the usability issue, we propose an efficient smart-contract-based cloud storage auditing protocol.
 The protocol only requires one signature verification for integrity auditing.
 The signature verification is also natively supported by Ethereum, which makes the proposed protocol very efficient on smart contract cost.
-The proposed protocol also supports automatic user compensation.
+The proposed protocol also supports automatic user compensation and fair dispute arbitration to effectively prevent malicious participants.
 
 ## Usage
 ### Installation
@@ -29,10 +29,10 @@ Let's briefly introduce the layout of the project.
 ```text
 contracts
     autoPay.sol
-    SolRsaVerify.sol
 core
     autoPA.go
     utils.go
+    mht.go
 data
     data.go
 main.go
