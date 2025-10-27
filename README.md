@@ -1,4 +1,4 @@
-# Blockchain assisted low-onchain-cost cloud storage auditing
+# Cloud Storage Auditing on Ethereum for the Price of Storing a Number
 
 With the large-scale application of cloud storage services, the security of stored data is valued by individuals and companies.
 To enhance outsourced data security, cloud storage auditing is able to verify the integrity of the data without downloading all the data attracts research efforts.
